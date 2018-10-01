@@ -157,7 +157,9 @@
     <ClInclude Include="PlayerCharacterController.hpp" />
     <ClInclude Include="PlayerCharacterRenderer.hpp" />
     <ClInclude Include="PlayerCharacterState.hpp" />
+    <ClInclude Include="PlayerLifeState.hpp" />
     <ClInclude Include="RechargeableAttributeState.hpp" />
+    <ClInclude Include="Terrain.hpp" />
     <ClInclude Include="util.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

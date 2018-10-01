@@ -1,9 +1,11 @@
 #pragma once
 
 #include <math.h>
+#include <vector>
 #include "PlayerCharacterState.hpp"
 #include "util.hpp"
 #include "globals.hpp"
+#include "Terrain.hpp"
 
 class PlayerCharacter
 {
@@ -26,7 +28,7 @@ public:
 		sf::Vector2f strafe_direction(character_direction.y, -character_direction.x);
 
 		float roll_axis_speed = walking_speed;
-		if (the_controller.get_running_state() && state.stamina.get_value())
+		if (the_controller.get_running_state() && !state.stamina.get_recovering() && state.stamina.get_value())
 		{
 			roll_axis_speed *= running_multiplier;
 		}
@@ -39,7 +41,7 @@ public:
 
 	void update_state()
 	{
-		state.extrapolate(timestep_f);
+		state.update(timestep_f);
 	}
 
 	PlayerCharacterState get_state() const
@@ -49,5 +51,6 @@ public:
 
 private:
 	PlayerCharacterState state;
+	Terrain ground_terrain;
 };
 const float PlayerCharacter::running_multiplier = 1.75f; // Because no reason.. (c++)

@@ -74,6 +74,11 @@ public:
 		}
 	}
 
+	void key_channeling(bool pressed)
+	{
+		is_channeling = pressed;
+	}
+
 	void mouse_moved(const sf::Vector2i& mouse_pos)
 	{
 		this->mouse_pos = mouse_pos;
@@ -104,10 +109,16 @@ public:
 		return mouse_pos;
 	}
 
+	bool get_channeling() const
+	{
+		return is_channeling;
+	}
+
 private:
 	RollAxisMovementState roll_state;
 	PitchAxisMovementState pitch_state;
 	bool running_state;
 	sf::Vector2i mouse_pos;
+	bool is_channeling;
 };
 PlayerCharacterController the_controller;

@@ -2,6 +2,7 @@
 
 #include <SFML\System\Vector2.hpp>
 #include "RechargeableAttributeState.hpp"
+#include "PlayerLifeState.hpp"
 
 struct PlayerCharacterState
 {
@@ -10,50 +11,27 @@ struct PlayerCharacterState
 	{
 	}
 
-	PlayerCharacterState& operator=(const PlayerCharacterState& rhs)
+	static PlayerCharacterState interpolate(const PlayerCharacterState& left, const PlayerCharacterState& right, float alpha)
 	{
-		this->movement_vec = rhs.movement_vec;
-		this->position = rhs.position;
-		this->yaw = rhs.yaw;
-		this->stamina = rhs.stamina;
-		return *this;
+		auto new_state = left;
+		new_state.position = new_state.position * alpha + right.position * (1.0f - alpha);
+		new_state.yaw = new_state.yaw * alpha + right.yaw * (1.0f - alpha);
+		new_state.stamina = RechargeableAttributeState::interpolate(left.stamina, right.stamina, alpha);
+		new_state.life = PlayerLifeState::interpolate(left.life, right.life, alpha);
+		return new_state;
 	}
 
 
-	void extrapolate(float time_delta)
+	void update(float time_delta)
 	{
 		position += movement_vec * time_delta;
 		stamina.update(time_delta);
-	}
-
-	PlayerCharacterState interpolate(const PlayerCharacterState& state, float alpha)
-	{
-		// TODO: MAYBE NOT A GOOD DESIGN AS A MEMBER FUNCTION (FREE FUNCTION?)
-		PlayerCharacterState new_state = *this;
-		new_state = new_state * (1.0f - alpha) + state * alpha;
-		return new_state;
-	}
-
-	friend PlayerCharacterState operator*(const PlayerCharacterState& state, float alpha)
-	{
-		PlayerCharacterState new_state = state;
-		new_state.position *= alpha;
-		new_state.yaw *= alpha;
-		new_state.stamina *= alpha;
-		return new_state;
-	}
-
-	PlayerCharacterState operator+(const PlayerCharacterState& rhs)
-	{
-		PlayerCharacterState new_state = *this;
-		new_state.position += rhs.position;
-		new_state.yaw += rhs.yaw;
-		new_state.stamina += rhs.stamina;
-		return new_state;
+		life.update(time_delta);
 	}
 
 	sf::Vector2f position;
 	sf::Vector2f movement_vec;
 	float yaw;
 	RechargeableAttributeState stamina;
+	PlayerLifeState life;
 };

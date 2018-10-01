@@ -19,6 +19,8 @@ using namespace std::chrono_literals;
 constexpr std::chrono::nanoseconds timestep(16ms);
 bool should_quit_game = false;
 
+// class TerrainArea -> Class to represent terrain that modifies properties like movement speed or reduces life over time"
+
 void handle_event_for_game(const sf::Event& event)
 {
 	if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased)
@@ -77,33 +79,58 @@ void read_input()
 	}
 }
 
-void render_game_interface(const PlayerCharacterState& player_state)
+void render_filled_bar(int margin_screen,
+	int margin_bars,
+	int border_width,
+	const sf::Vector2f bar_size,
+	int bar_idx,
+	const sf::Color& background_color,
+	const sf::Color& fill_color,
+	float fill_value
+	)
 {
-	// Render stamina bar of the player in bottom left corner
-	sf::Vector2f bar_size(window_resolution.width * 0.1, window_resolution.height * 0.05);
-	const std::size_t margin = 40; // pixel
-	const std::size_t border_width = 3; // pixel
+	sf::Vector2f bar_size_fx(bar_size.x + 2 * border_width, bar_size.y + 2 * border_width);
+	int bar_pos_y = window_resolution.height - margin_screen - (bar_idx + 1) * bar_size.y - bar_idx * margin_bars;
+	sf::Vector2f pos(margin_screen, bar_pos_y);
 
-	sf::Vector2f pos(margin, window_resolution.height - margin - bar_size.y);
-	//sf::Vector2f pos_fill(pos.x + border_width, pos.y + border_width);
-
-	sf::RectangleShape shape(bar_size);
+	sf::RectangleShape shape(bar_size_fx);
 	shape.setPosition(pos);
 	shape.setOutlineColor(sf::Color::Black);
-	shape.setOutlineThickness(border_width);
-	sf::Color background_fill = sf::Color::Green;
-	background_fill.a = 255 * 0.3f;
-	shape.setFillColor(background_fill);
+	shape.setOutlineThickness(-border_width);
+	shape.setFillColor(background_color);
 
-	bar_size.x *= player_state.stamina.get_fill();
-	sf::RectangleShape shape_fill(bar_size);
-	shape_fill.setPosition(pos);
+	auto border_width_vec = sf::Vector2f(border_width, border_width);
+	bar_size_fx = bar_size_fx - border_width_vec * 2.0f;
+	bar_size_fx.x *= fill_value;
+	sf::RectangleShape shape_fill(bar_size_fx);
+	shape_fill.setPosition(pos + border_width_vec);
 	shape_fill.setOutlineColor(sf::Color::Transparent);
 	shape_fill.setOutlineThickness(0);
-	shape_fill.setFillColor(sf::Color::Green);
+	shape_fill.setFillColor(fill_color);
 
 	window_handle.draw(shape);
 	window_handle.draw(shape_fill);
+}
+
+void update_game(PlayerCharacter& player)
+{
+	player.update_state();
+}
+
+void render_game_interface(const PlayerCharacterState& player_state)
+{
+	// Render stamina bar of the player in bottom left corner, first stamina then life
+	const int margin_screen = 25;
+	const int margin_bars = 10;
+	const int border_width = 1;
+	const sf::Vector2f bar_size(window_resolution.width * 0.15f, window_resolution.height * 0.015f);
+
+	sf::Color stamina_bg = sf::Color(0, 127, 0);
+	render_filled_bar(margin_screen, margin_bars, border_width, bar_size, 0, stamina_bg, sf::Color::Green, player_state.stamina.get_fill());
+
+	sf::Color life_bg = sf::Color::Red;
+	life_bg.a = 0.95f;
+	render_filled_bar(margin_screen, margin_bars, border_width, bar_size, 1, life_bg, sf::Color::Red, player_state.life.get_fill());
 }
 
 int main() {
@@ -143,15 +170,15 @@ int main() {
 
 			previous_state = current_state;
 			//update(&current_state); // update at a fixed rate each time
-			the_player.update_state();
+			update_game(the_player);
 			current_state = the_player.get_state();
 		}
 
 		// calculate how close or far we are from the next timestep
 		auto alpha = (float)lag.count() / timestep.count();
-		auto interpolated_state = previous_state.interpolate(current_state, alpha);
+		auto interpolated_state = PlayerCharacterState::interpolate(previous_state, current_state, alpha);
 		auto extrapolated_state = current_state;
-		extrapolated_state.extrapolate(timestep_f * alpha);
+		extrapolated_state.update(timestep_f * alpha);
 
 		//render(interpolated_state);
 		window_handle.clear(sf::Color::Cyan);
