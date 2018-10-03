@@ -1,3 +1,4 @@
+/*
 #include <chrono>
 #include <cmath>
 
@@ -190,4 +191,15 @@ int main() {
 
 		window_handle.display();
 	}
+}
+*/
+
+#include "Game.hpp"
+
+int main()
+{
+	Game::instance()->run();
+
+
+	return 0;
 }

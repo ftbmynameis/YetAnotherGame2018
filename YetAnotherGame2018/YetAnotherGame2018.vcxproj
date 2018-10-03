@@ -148,18 +148,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="globals.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PlayerEntity.cpp" />
+    <ClCompile Include="PlayerEntityRenderer.cpp" />
+    <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Entity.hpp" />
+    <ClInclude Include="Game.hpp" />
     <ClInclude Include="globals.hpp" />
     <ClInclude Include="PlayerCharacter.hpp" />
     <ClInclude Include="PlayerCharacterController.hpp" />
     <ClInclude Include="PlayerCharacterRenderer.hpp" />
     <ClInclude Include="PlayerCharacterState.hpp" />
+    <ClInclude Include="PlayerController.hpp" />
+    <ClInclude Include="PlayerEntity.hpp" />
+    <ClInclude Include="PlayerEntityRenderer.hpp" />
     <ClInclude Include="PlayerLifeState.hpp" />
     <ClInclude Include="RechargeableAttributeState.hpp" />
     <ClInclude Include="Terrain.hpp" />
+    <ClInclude Include="UniqueIdGenerator.hpp" />
     <ClInclude Include="util.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
